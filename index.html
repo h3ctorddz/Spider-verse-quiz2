@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spider-Verse Challenge</title>
+<style>
+  :root { --red:#e62429; --blue:#123c8c; --deep:#07152f; --ink:#f7f9ff; --muted:#b9c7e8; --gold:#ffd166; }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; min-height:100vh; color:var(--ink);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:
+      radial-gradient(circle at 15% 10%, #e6242933 0 2px, transparent 3px),
+      radial-gradient(circle at 80% 35%, #ffffff18 0 2px, transparent 3px),
+      linear-gradient(135deg, #061126 0%, #102e68 52%, #07152f 100%);
+    background-size:42px 42px, 58px 58px, auto;
+    display:flex; align-items:center; justify-content:center; padding:22px;
+  }
+  .wrap { width:min(760px,100%); }
+  header { text-align:center; margin-bottom:18px; }
+  .logo {
+    display:inline-flex; align-items:center; justify-content:center; width:76px;height:76px;
+    border-radius:50%; background:var(--red); border:4px solid white; box-shadow:0 0 0 5px #e6242940, 0 12px 30px #0007;
+    font-size:42px; margin-bottom:10px;
+  }
+  h1 { margin:0; text-transform:uppercase; letter-spacing:2px; font-size:clamp(1.7rem,5vw,2.7rem); }
+  h1 span { color:var(--red); text-shadow:2px 2px 0 white; }
+  .subtitle { color:var(--muted); margin:8px 0 0; }
+  .card { background:#0b1b3aeF; border:1px solid #8aa8e955; border-radius:22px; padding:clamp(20px,5vw,36px); box-shadow:0 22px 70px #0008; position:relative; overflow:hidden; }
+  .card:before { content:""; position:absolute; top:-60px; right:-60px; width:170px; height:170px; border:2px solid #ffffff12; border-radius:50%; box-shadow:0 0 0 18px #ffffff08,0 0 0 36px #ffffff05; pointer-events:none; }
+  .topline { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; position:relative; }
+  .tag { background:var(--red); color:white; font-weight:800; font-size:.76rem; padding:7px 11px; border-radius:999px; letter-spacing:.7px; }
+  .count { color:var(--muted); font-weight:700; font-variant-numeric:tabular-nums; }
+  .track { height:8px; background:#ffffff18; border-radius:20px; overflow:hidden; margin-bottom:28px; }
+  .bar { height:100%; width:6.666%; background:linear-gradient(90deg,var(--red),#ff7b55); border-radius:20px; transition:width .25s; }
+  .q-label { color:var(--gold); font-size:.78rem; letter-spacing:2px; font-weight:800; text-transform:uppercase; }
+  #question { font-size:clamp(1.25rem,3.8vw,1.8rem); line-height:1.4; margin:12px 0 24px; min-height:90px; position:relative; }
+  .answer { display:none; border-left:4px solid #45d6a2; background:#45d6a21a; padding:16px 18px; border-radius:0 12px 12px 0; line-height:1.6; margin:0 0 22px; }
+  .answer.show { display:block; animation:pop .2s ease-out; }
+  .answer strong { display:block; color:#65edbd; font-size:.8rem; letter-spacing:1px; margin-bottom:5px; }
+  .actions { display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; }
+  button { border:0; border-radius:12px; padding:13px 17px; font-size:.95rem; font-weight:800; cursor:pointer; transition:transform .15s, opacity .15s; }
+  button:hover { transform:translateY(-2px); }
+  button:focus-visible { outline:3px solid var(--gold); outline-offset:3px; }
+  button:disabled { opacity:.35; cursor:not-allowed; transform:none; }
+  .secondary { color:white; background:#ffffff16; border:1px solid #ffffff25; }
+  .primary { color:white; background:var(--red); box-shadow:0 5px 0 #9d1018; }
+  .reveal { color:#07152f; background:var(--gold); }
+  .hint { color:var(--muted); text-align:center; font-size:.82rem; margin:18px 0 0; }
+  .end { display:none; text-align:center; padding:16px 0 4px; }
+  .end h2 { font-size:2rem; margin:4px 0 10px; }
+  .end p { color:var(--muted); line-height:1.6; }
+  .end .big { font-size:3.6rem; margin-bottom:4px; }
+  footer { text-align:center; color:#9eafd5; font-size:.76rem; margin-top:15px; }
+  @keyframes pop { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+  @media(max-width:460px) { body{padding:12px;} .card{border-radius:17px;} .actions{display:grid;grid-template-columns:1fr 1fr;} .reveal{grid-column:1/-1;grid-row:1;} button{padding:12px 10px;} #question{min-height:120px;} }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <div class="logo" aria-hidden="true">🕷️</div>
+    <h1><span>Spider-Verse</span> Challenge</h1>
+    <p class="subtitle">15 preguntas · Modal verbs: Can, Could, Would</p>
+  </header>
+  <section class="card" aria-live="polite">
+    <div id="quiz">
+      <div class="topline">
+        <span class="tag">MISIÓN ARÁCNIDA</span>
+        <span class="count" id="count">Pregunta 1 de 15</span>
+      </div>
+      <div class="track"><div class="bar" id="bar"></div></div>
+      <div class="q-label">Tu misión</div>
+      <h2 id="question"></h2>
+      <div class="answer" id="answer">
+        <strong>RESPUESTA</strong>
+        <span id="answerText"></span>
+      </div>
+      <div class="actions">
+        <button class="secondary" id="prev" type="button">← Anterior</button>
+        <button class="reveal" id="reveal" type="button">🕸️ Ver respuesta</button>
+        <button class="primary" id="next" type="button">Siguiente →</button>
+      </div>
+      <p class="hint">Piensa tu respuesta antes de revelar la solución. ¡Un gran poder conlleva una gran responsabilidad!</p>
+    </div>
+    <div class="end" id="end">
+      <div class="big">🕸️</div>
+      <h2>¡Misión completada!</h2>
+      <p>Has recorrido las 15 preguntas del Spider-Verse Challenge.</p>
+      <button class="primary" id="restart" type="button">Volver a empezar ↻</button>
+    </div>
+  </section>
+  <footer>Fan quiz educativo inspirado en el Spider-Verse · Practica can, could y would</footer>
+</main>
+<script>
+const questions = [
+  { q:"What can Miles do after he gets bitten by the radioactive spider?", a:"He can stick to walls, use a venom strike, turn invisible, and sense danger." },
+  { q:"Why could Wilson Fisk’s collider be dangerous for the city?", a:"It could tear open dimensions and threaten the city and its people." },
+  { q:"How can Miles learn to control his new powers?", a:"He can practice, trust himself, and learn from the other Spider-people." },
+  { q:"What advice would Peter B. Parker give Miles about being Spider-Man?", a:"He would tell Miles to believe in himself and take responsibility." },
+  { q:"How could Spider-Ham help the team during a fight?", a:"Spider-Ham could distract enemies and help the team with his unusual abilities." },
+  { q:"What would happen if the different dimensions continued to collapse?", a:"The dimensions could break down, putting everyone in danger." },
+  { q:"Why could Aaron Davis’s secret identity surprise Miles?", a:"Aaron is secretly the Prowler, so Miles could be shocked to discover the truth." },
+  { q:"How can Olivia Octavius use science to help Kingpin?", a:"She can help Kingpin operate the collider and study the different dimensions." },
+  { q:"What could Jefferson do to protect the city from danger?", a:"He could investigate threats and work to keep people safe as a police officer." },
+  { q:"How would Gwen react if she had to return to her own dimension?", a:"Gwen would feel sad about leaving her friends, but she would try to return home safely." },
+  { q:"What can Miles learn from taking his leap of faith?", a:"He can learn to trust himself and become the hero he is meant to be." },
+  { q:"Who could wear the Spider-Man mask, according to the movie’s message?", a:"Anyone could wear the mask if they are willing to be brave and help others." },
+  { q:"How would the story change if Miles refused to become Spider-Man?", a:"Without Miles, the other Spider-people could struggle to stop Kingpin and save the dimensions." },
+  { q:"What can the different Spider-people teach Miles about teamwork?", a:"They can teach him to cooperate, trust others, and use their different strengths." },
+  { q:"Why would Miles say that anyone can wear the mask?", a:"He would say it because being a hero depends on courage and choices, not appearance." }
+];
+let index = 0;
+const questionEl = document.getElementById("question");
+const answerEl = document.getElementById("answer");
+const answerText = document.getElementById("answerText");
+const countEl = document.getElementById("count");
+const barEl = document.getElementById("bar");
+const prevBtn = document.getElementById("prev");
+const nextBtn = document.getElementById("next");
+const revealBtn = document.getElementById("reveal");
+const quizEl = document.getElementById("quiz");
+const endEl = document.getElementById("end");
+
+function render() {
+  const item = questions[index];
+  questionEl.textContent = item.q;
+  answerText.textContent = item.a;
+  countEl.textContent = `Pregunta ${index + 1} de ${questions.length}`;
+  barEl.style.width = `${((index + 1) / questions.length) * 100}%`;
+  answerEl.classList.remove("show");
+  revealBtn.textContent = "🕸️ Ver respuesta";
+  prevBtn.disabled = index === 0;
+  nextBtn.textContent = index === questions.length - 1 ? "Terminar ✓" : "Siguiente →";
+}
+revealBtn.addEventListener("click", () => {
+  const visible = answerEl.classList.toggle("show");
+  revealBtn.textContent = visible ? "Ocultar respuesta" : "🕸️ Ver respuesta";
+});
+prevBtn.addEventListener("click", () => { if (index > 0) { index--; render(); } });
+nextBtn.addEventListener("click", () => {
+  if (index < questions.length - 1) { index++; render(); }
+  else { quizEl.style.display = "none"; endEl.style.display = "block"; }
+});
+document.getElementById("restart").addEventListener("click", () => {
+  index = 0; endEl.style.display = "none"; quizEl.style.display = "block"; render();
+});
+render();
+</script>
+</body>
+</html>
